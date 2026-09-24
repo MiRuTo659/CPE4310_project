@@ -1,0 +1,15 @@
+﻿task,model,AUC,PR-AUC,F1,Accuracy
+B_late_finish,Random Forest,0.852,0.855,0.77,0.753
+B_late_finish,KNN,0.759,0.73,0.669,0.688
+B_late_finish,Decision Tree,0.732,0.689,0.557,0.655
+B_late_finish,SVM (RBF),0.729,0.702,0.638,0.646
+B_late_finish,ANN (MLP),0.729,0.72,0.646,0.634
+B_late_finish,Naive Bayes,0.713,0.692,0.609,0.649
+B_late_finish,Baseline (เหมือนวันทำงานก่อนหน้า),,,0.56,0.583
+C_absent,Random Forest,0.808,0.497,0.48,0.8
+C_absent,KNN,0.803,0.487,0.488,0.854
+C_absent,ANN (MLP),0.784,0.476,0.229,0.834
+C_absent,SVM (RBF),0.777,0.506,0.511,0.85
+C_absent,Naive Bayes,0.77,0.408,0.483,0.794
+C_absent,Decision Tree,0.759,0.431,0.456,0.807
+C_absent,Baseline (เหมือนเมื่อวาน),,,0.2,0.713
