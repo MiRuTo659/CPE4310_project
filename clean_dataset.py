@@ -1,10 +1,3 @@
-"""
-คลีนข้อมูล RFID_-_2569.csv
-ใช้งาน: python clean_rfid.py RFID_-_2569.csv
-ผลลัพธ์:
-  rfid_daily.csv  -> 1 แถว = 1 คน 1 วัน (พร้อมฟีเจอร์เบื้องต้น)
-  rfid_scans.csv  -> 1 แถว = 1 การสแกน
-"""
 import re
 import sys
 
