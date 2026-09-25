@@ -31,14 +31,8 @@
 ├── Thailand_Model_Comparison.csv
 ├── Thailand_Temperature_Forecast_2024_2028.csv
 ├── Thailand_Temperature_Forecast.png
-├── Thailand_AI_Training_Results.png
-└── None_use/
-    ├── dataset/
-    ├── pj1/
-    └── pj2/
+└── Thailand_AI_Training_Results.png
 ```
-
-โฟลเดอร์ `None_use/` เป็นงานทดลองชุดอื่นเกี่ยวกับ RFID และการจำแนกประเภทหนังสือ ไม่ได้อยู่ในกระบวนการหลักของโครงงานพยากรณ์อุณหภูมิ
 
 ## ข้อมูลที่ใช้
 
