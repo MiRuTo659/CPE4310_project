@@ -1,49 +1,23 @@
-# Thailand Temperature Change Forecasting
+# การพยากรณ์การเปลี่ยนแปลงอุณหภูมิของประเทศไทย
 
-> A student Data Mining / Machine Learning project for preparing Thailand temperature-change data and generating a five-year forecast.
+โครงงาน Data Mining และ Machine Learning สำหรับเตรียมข้อมูลการเปลี่ยนแปลงอุณหภูมิของประเทศไทย และสร้างแบบจำลองเพื่อพยากรณ์ล่วงหน้า 5 ปี
 
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-data%20processing-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
 [![scikit--learn](https://img.shields.io/badge/scikit--learn-modeling-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 
-## Table of Contents
+## ภาพรวมโครงงาน
 
-- [Project Overview](#project-overview)
-- [Objectives](#objectives)
-- [Repository Structure](#repository-structure)
-- [Data](#data)
-- [Workflow](#workflow)
-- [Models](#models)
-- [Available Outputs](#available-outputs)
-- [Visualizations](#visualizations)
-- [How to Run](#how-to-run)
-- [Reproducibility Notes](#reproducibility-notes)
-- [Academic Notes](#academic-notes)
+โครงงานนี้ใช้ข้อมูลจาก FAOSTAT เพื่อวิเคราะห์แนวโน้มการเปลี่ยนแปลงอุณหภูมิรายปีของประเทศไทย โดยกรองข้อมูล ทำความสะอาด ฝึกแบบจำลอง และพยากรณ์ 5 ปีถัดไป
 
-## Project Overview
+## วัตถุประสงค์
 
-This repository contains a workflow for working with annual **temperature change in Thailand**:
+- สร้างชุดข้อมูลอุณหภูมิของประเทศไทยที่พร้อมใช้งาน
+- ศึกษาแนวโน้มการเปลี่ยนแปลงอุณหภูมิรายปี
+- เปรียบเทียบแบบจำลองการถดถอย 2 วิธี
+- สร้างไฟล์ผลพยากรณ์และกราฟสำหรับนำเสนอ
 
-1. Load a FAOSTAT temperature-change dataset.
-2. Filter the records for Thailand, annual meteorological data, and the `Temperature change` element.
-3. Clean numeric fields, remove incomplete records, remove duplicates, check missing years, and interpolate missing years when needed.
-4. Train forecasting models using year as the input feature.
-5. Compare the available model outputs and forecast the next five years.
-
-The main workflow is implemented in `clean.py` and `train_data.ipynb`.
-
-## Objectives
-
-- Prepare a reproducible dataset from the available FAOSTAT source files.
-- Explore a time-based temperature-change series for Thailand.
-- Compare Linear Regression and Random Forest regression workflows.
-- Produce tabular forecast output and a visualization for further discussion.
-
-## Repository Structure
-
-```text
-.
-├── clean.py
+## โครงสร้างไฟล์
 ├── clean_dataset.ipynb
 ├── train_data.ipynb
 ├── dataset/
@@ -62,159 +36,150 @@ The main workflow is implemented in `clean.py` and `train_data.ipynb`.
     └── pj2/
 ```
 
-`None_use/` contains separate RFID and book-category classification experiments, including their own datasets, notebooks, scripts, and images. Those files are retained in the repository but are not part of the main Thailand temperature forecasting workflow documented above.
+โฟลเดอร์ `None_use/` เป็นงานทดลองชุดอื่นเกี่ยวกับ RFID และการจำแนกประเภทหนังสือ ไม่ได้อยู่ในกระบวนการหลักของโครงงานพยากรณ์อุณหภูมิ
 
-## Data
+## ข้อมูลที่ใช้
 
-### Source files
+### ข้อมูลต้นฉบับ
 
-The main cleaning script reads:
+สคริปต์ `clean.py` อ่านข้อมูลจากไฟล์ต่อไปนี้
 
 ```text
 dataset/FAOSTAT_data_en_11-1-2024.csv
 ```
 
-Other source CSV files are also present in `dataset/`, but the current `clean.py` input path points to the file above.
+ไฟล์ CSV อื่นในโฟลเดอร์ `dataset/` เป็นแหล่งข้อมูลเพิ่มเติม แต่ `clean.py` ใช้ไฟล์ข้างต้นเป็นข้อมูลนำเข้า
 
-### Cleaned dataset
+### ข้อมูลที่ผ่านการทำความสะอาด
 
-`Thailand_Temperature_Clean.csv` contains the columns:
+ไฟล์ `Thailand_Temperature_Clean.csv` มีคอลัมน์หลักดังนี้
 
-| Column | Description based on the file and cleaning code |
+| คอลัมน์ | ความหมาย |
 |---|---|
-| `Year` | Observation year |
-| `Value` | Temperature change value in the source unit, represented as degrees Celsius in the project output |
+| `Year` | ปีที่สังเกตข้อมูล |
+| `Value` | ค่าการเปลี่ยนแปลงอุณหภูมิ หน่วยองศาเซลเซียสตามผลลัพธ์ของโครงงาน |
 
-The checked file contains **63 rows**, covering **1961-2023**. The cleaning script creates this two-column format after filtering and validation.
+ข้อมูลมี 63 แถว ครอบคลุมปี 1961–2023
 
-## Workflow
+## ขั้นตอนการทำงาน
 
-### 1. Cleaning
+### 1. การทำความสะอาดข้อมูล
 
-`clean.py` performs the following operations:
+`clean.py` ดำเนินการดังนี้
 
-- Reads the FAOSTAT file with `latin1` encoding.
-- Cleans column names by removing a possible BOM and surrounding whitespace.
-- Selects `Thailand` records.
-- Selects the `Temperature change` element.
-- Selects `Meteorological year` records.
-- Keeps `Area`, `Year`, `Unit`, `Value`, and `Flag` before finalizing the cleaned dataset.
-- Converts `Year` and `Value` to numeric values.
-- Removes missing values and duplicate rows.
-- Checks duplicate and missing years.
-- Linearly interpolates missing years when they exist.
-- Saves `Thailand_Temperature_Clean.csv`.
+- อ่านไฟล์ FAOSTAT ด้วย encoding `latin1`
+- ลบ BOM และช่องว่างส่วนเกินจากชื่อคอลัมน์
+- เลือกข้อมูลเฉพาะ `Thailand`
+- เลือกรายการ `Temperature change`
+- เลือกข้อมูลรายปี `Meteorological year`
+- ลบค่าว่างและข้อมูลซ้ำ พร้อมตรวจสอบปีที่ขาดหาย
+- เติมปีที่ขาดหายด้วยการประมาณค่าแบบเส้นตรงเมื่อจำเป็น
+- บันทึกผลเป็น `Thailand_Temperature_Clean.csv`
 
-### 2. Model training and forecasting
+### 2. การฝึกแบบจำลองและพยากรณ์
 
-`train_data.ipynb`:
+ใน `train_data.ipynb` มีการดำเนินการดังนี้
 
-- Detects the year and temperature-value columns.
-- Splits the final time series into training and test sections using `TEST_RATIO = 0.20`, with at least three test rows.
-- Uses `Year` as the model feature and temperature change as the target.
-- Trains Linear Regression and Random Forest regression models.
-- Forecasts `FORECAST_YEARS = 5` future years.
-- Saves a forecast CSV and a plot.
+- ตรวจหาคอลัมน์ปีและคอลัมน์อุณหภูมิ
+- แบ่งข้อมูล 80% แรกเป็นชุดฝึก และ 20% ท้ายเป็นชุดทดสอบ
+- ใช้ `Year` เป็นตัวแปรอิสระ และใช้การเปลี่ยนแปลงอุณหภูมิเป็นตัวแปรเป้าหมาย
+- ฝึก Linear Regression และ Random Forest
+- ประเมินผลด้วยค่า MAE และ RMSE
+- ฝึกแบบจำลองอีกครั้งด้วยข้อมูลทั้งหมด แล้วพยากรณ์ 5 ปีถัดไป
+- บันทึกผลลัพธ์เป็นไฟล์ CSV และกราฟ PNG
 
-## Models
+## แบบจำลอง
 
-The main notebook contains these regression models:
-
-| Model | Role in the workflow |
+| แบบจำลอง | คำอธิบาย |
 |---|---|
-| Linear Regression | Fits a linear relationship between year and temperature change |
-| Random Forest Regressor | Provides a tree-based regression comparison |
+| Linear Regression | หาความสัมพันธ์เชิงเส้นระหว่างปีและการเปลี่ยนแปลงอุณหภูมิ |
+| Random Forest Regressor | ใช้ต้นไม้ตัดสินใจหลายต้นเพื่อประมาณค่าการเปลี่ยนแปลงอุณหภูมิ |
 
-The notebook code evaluates regression performance using **MAE** and **RMSE** on its train/test split. The committed `Thailand_Model_Comparison.csv` currently has a different schema: `Model,Accuracy_%`. Because the source and calculation of that `Accuracy_%` column are not documented in the current root workflow, those values are reported as-is and are not reinterpreted as MAE, RMSE, or a classification score.
-
-## Available Outputs
-
-The following generated files are present in the repository:
-
-| File | Contents |
+- **MAE:** ค่าความคลาดเคลื่อนสัมบูรณ์เฉลี่ย ยิ่งต่ำยิ่งดี
+- **RMSE:** รากที่สองของค่าเฉลี่ยความคลาดเคลื่อนกำลังสอง ยิ่งต่ำยิ่งดี และลงโทษความคลาดเคลื่อนขนาดใหญ่ชัดเจนกว่า MAE
+| แบบจำลอง | บทบาท |
 |---|---|
-| `Thailand_Temperature_Clean.csv` | Cleaned annual Thailand temperature-change series |
-| `Thailand_Model_Comparison.csv` | Two-row model comparison file with a recorded `Accuracy_%` column |
-| `Thailand_Temperature_Forecast_2024_2028.csv` | Forecast values for 2024-2028, including both model columns and the selected forecast model |
-| `Thailand_Temperature_Forecast.png` | Forecast visualization |
-| `Thailand_AI_Training_Results.png` | Existing image asset; its generating workflow is not documented in the root scripts |
+| Linear Regression | สร้างความสัมพันธ์เชิงเส้นระหว่างปีและอุณหภูมิ |
+| Random Forest Regressor | ใช้เปรียบเทียบกับแบบจำลองต้นไม้ |
 
-### Recorded comparison file
+โค้ดใน notebook ประเมินผลด้วย **MAE** และ **RMSE** จากชุดฝึกและชุดทดสอบ อย่างไรก็ตาม ไฟล์ `Thailand_Model_Comparison.csv` ที่มีอยู่เดิมใช้คอลัมน์ `Accuracy_%` ซึ่งไม่ตรงกับรูปแบบเมตริกในโค้ด จึงควรสร้างไฟล์ผลเปรียบเทียบใหม่ก่อนนำตัวเลขไปสรุป
 
-The values below are copied from `Thailand_Model_Comparison.csv`; no new metrics have been calculated for this README.
+## ผลลัพธ์ที่มีในโครงการ
 
-| Model | Recorded `Accuracy_%` |
+ไฟล์ผลลัพธ์ที่มีอยู่ ได้แก่
+
+| ไฟล์ | รายละเอียด |
+|---|---|
+| `Thailand_Temperature_Clean.csv` | ข้อมูลอุณหภูมิรายปีที่ผ่านการทำความสะอาด |
+| `Thailand_Model_Comparison.csv` | ผลเปรียบเทียบแบบจำลองที่บันทึกไว้ |
+| `Thailand_Temperature_Forecast_2024_2028.csv` | ค่าพยากรณ์ปี 2024–2028 |
+| `Thailand_Temperature_Forecast.png` | กราฟข้อมูลจริงและค่าพยากรณ์ |
+| `Thailand_AI_Training_Results.png` | รูปผลการฝึกแบบจำลองที่มีอยู่ในโครงการ |
+
+### ผลการเปรียบเทียบที่บันทึกไว้
+
+ค่าด้านล่างคัดลอกจาก `Thailand_Model_Comparison.csv` โดยไม่ได้คำนวณเมตริกใหม่ใน README นี้
+
+| แบบจำลอง | ค่า `Accuracy_%` ที่บันทึกไว้ |
 |---|---:|
 | Linear Regression | 72.24812298259296 |
 | Random Forest | 43.94041259500588 |
 
-### Recorded forecast output
+### ผลการพยากรณ์ที่บันทึกไว้
 
-The forecast CSV records Linear Regression as the selected forecast model for 2024-2028. Its `Forecast_Temperature_Change_C` values are:
+ไฟล์ผลพยากรณ์เลือก Linear Regression สำหรับปี 2024–2028 โดยมีค่าดังนี้
 
-| Year | Forecast model | Forecast temperature change (C) |
+| ปี | แบบจำลอง | การเปลี่ยนแปลงอุณหภูมิที่พยากรณ์ |
 |---:|---|---:|
 | 2024 | Linear Regression | 1.170 |
 | 2025 | Linear Regression | 1.192 |
 | 2026 | Linear Regression | 1.214 |
 | 2027 | Linear Regression | 1.236 |
-| 2028 | Linear Regression | 1.259 |
 
-These are repository output values, not a claim that the forecast is scientifically validated or suitable for operational decision-making.
-
-## Visualizations
-
-### Temperature forecast
+### กราฟการพยากรณ์อุณหภูมิ
 
 ![Thailand temperature forecast](Thailand_Temperature_Forecast.png)
 
-### Existing training-results image
+### รูปผลการฝึกแบบจำลอง
 
 ![Thailand AI training results](Thailand_AI_Training_Results.png)
 
-## How to Run
+## วิธีใช้งาน
 
-### Requirements
+### ติดตั้งไลบรารี
 
-The repository does not currently include a root-level `requirements.txt`. Install the packages imported by the main workflow in an active Python environment:
+โครงการยังไม่มีไฟล์ `requirements.txt` ให้ติดตั้งไลบรารีที่ใช้ด้วยคำสั่งต่อไปนี้
 
 ```bash
 python -m pip install numpy pandas matplotlib scikit-learn
 ```
 
-### Run the cleaning script
+### รันสคริปต์ทำความสะอาดข้อมูล
 
-Run from the repository root so the relative input path resolves correctly:
+เปิด Terminal ที่โฟลเดอร์หลักของโครงการ แล้วรันคำสั่งนี้
 
 ```bash
 python clean.py
 ```
 
-This regenerates `Thailand_Temperature_Clean.csv` from the configured FAOSTAT input.
+คำสั่งนี้จะสร้างหรือเขียนทับ `Thailand_Temperature_Clean.csv`
 
-### Run the notebook
+### รัน Notebook
 
-Open `train_data.ipynb` in Jupyter Notebook or VS Code, then run the cells in order. The notebook expects `Thailand_Temperature_Clean.csv` in the repository root and writes forecast/comparison outputs to the same working directory.
+เปิด `train_data.ipynb` ด้วย Jupyter Notebook หรือ VS Code แล้วรันเซลล์ตามลำดับ โดยต้องมี `Thailand_Temperature_Clean.csv` อยู่ในโฟลเดอร์หลัก
 
-## Reproducibility Notes
+## ข้อควรทราบในการทำซ้ำผลลัพธ์
 
-- Run commands from the repository root.
-- The current cleaned data ends at 2023, so the configured five-year forecast covers 2024-2028.
-- The forecast filename in the notebook is currently hard-coded as `Thailand_Temperature_Forecast_2024_2028.csv`.
-- The model-comparison CSV and the notebook code currently use different metric schemas. Regenerate and review the output before using the reported comparison as a final academic result.
-- No root-level `requirements.txt` or automated test suite is present in the inspected repository.
+- รันคำสั่งจากโฟลเดอร์หลักของโครงการ
+- ข้อมูลที่ทำความสะอาดแล้วสิ้นสุดที่ปี 2023 จึงพยากรณ์ปี 2024–2028
+- ชื่อไฟล์ผลพยากรณ์ใน notebook กำหนดไว้เป็น `Thailand_Temperature_Forecast_2024_2028.csv`
+- ไฟล์เปรียบเทียบแบบจำลองกับโค้ดใน notebook ใช้รูปแบบเมตริกต่างกัน ควรสร้างและตรวจสอบผลลัพธ์ใหม่ก่อนนำไปใช้เป็นผลการทดลองฉบับสมบูรณ์
+- ยังไม่มีไฟล์ `requirements.txt` หรือชุดทดสอบอัตโนมัติระดับโครงการ
 
-## Academic Notes
+## ข้อจำกัดและข้อควรระวัง
 
-This documentation records only files and values found in the repository. It does not add unobserved accuracy, precision, recall, F1-score, statistical significance, or external validation results.
+- แบบจำลองใช้เพียงปีเป็นตัวแปรนำเข้า จึงยังไม่ได้พิจารณาปัจจัยอื่น เช่น ปริมาณฝน ฤดูกาล หรือกิจกรรมของมนุษย์
+- การแบ่งข้อมูลแบบเรียงตามเวลาเหมาะสำหรับการทดสอบเบื้องต้น แต่ควรตรวจสอบเพิ่มเติมด้วยวิธี time-series validation
+- ผลพยากรณ์เป็นการประมาณจากข้อมูลในอดีต ไม่ใช่ค่าที่รับรองความถูกต้องของสภาพอากาศในอนาคต
+- ควรบันทึกเวอร์ชันของไลบรารี ค่า MAE และ RMSE ที่ได้จากการรันจริงก่อนส่งรายงานฉบับสมบูรณ์
 
-For a final submission, consider adding the following only after they have been produced and verified:
-
-- package versions or a `requirements.txt` file;
-- the exact MAE and RMSE output from the current notebook run;
-- an explanation of the source-data version and units;
-- a discussion of limitations, including the use of year as the only model feature.
-
----
-
-**Project status:** Reproducible working files and generated outputs are present; final metric reconciliation remains to be completed before treating the comparison table as a definitive evaluation.
